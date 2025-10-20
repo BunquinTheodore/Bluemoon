@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/config/constants.dart';
 import 'package:my_app/config/theme.dart';
-
-
+import 'package:my_app/screens/customer/customer_homescreen.dart';
 void main() {
   runApp(const BluemoonApp());
 }
@@ -18,7 +17,7 @@ class BluemoonApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
-      home: const HomePage(),
+      home: CustomerHomeScreen(),
     );
   }
 }

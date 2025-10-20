@@ -30,12 +30,10 @@ class AppTheme {
       primary: primaryBlue,
       secondary: accentBrown,
       surface: cardColor,
-      background: backgroundColor,
       error: error,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: textPrimary,
-      onBackground: textPrimary,
     ),
 
     // App Bar Theme
@@ -191,7 +189,6 @@ class AppTheme {
       primary: primaryBlue,
       secondary: accentBrown,
       surface: Color(0xFF1E1E1E),
-      background: Color(0xFF121212),
       error: error,
     ),
   );
