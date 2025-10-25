@@ -25,6 +25,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
+    fontFamily: 'NotoSans',
     
     colorScheme: ColorScheme.light(
       primary: primaryBlue,
@@ -185,6 +186,7 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
+    fontFamily: 'NotoSans',
     colorScheme: ColorScheme.dark(
       primary: primaryBlue,
       secondary: accentBrown,

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../models/product.dart';
 import '../../widgets/product_card.dart';
-
+import '../../config/routes.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 
 
 class CustomerHomeScreen extends StatefulWidget {
@@ -106,7 +108,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 icon: Icon(Icons.shopping_cart_outlined),
                 color: AppTheme.textPrimary,
                 onPressed: () {
-                  // TODO: Navigate to cart
+                  Navigator.pushNamed(context, AppRoutes.cart);
                 },
               ),
               Positioned(
@@ -122,14 +124,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     minWidth: 16,
                     minHeight: 16,
                   ),
-                  child: Text(
-                    '0',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                  child: Consumer<CartProvider>(
+                    builder: (_, cart, __) => Text(
+                      '${cart.count}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -215,12 +219,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         return ProductCard(
           product: product,
           onTap: () {
-            // TODO: Navigate to product detail
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${product.name} tapped!'),
-                duration: Duration(seconds: 1),
-              ),
+            Navigator.pushNamed(
+              context,
+              AppRoutes.product,
+              arguments: product,
             );
           },
         );
