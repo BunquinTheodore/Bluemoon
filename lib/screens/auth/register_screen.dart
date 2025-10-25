@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/config/theme.dart';
 import 'package:my_app/config/routes.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -24,29 +25,62 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      final user = cred.user;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'email': user.email,
+          'displayName': user.displayName,
+          'role': 'customer',
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signed in successfully')),
+        const SnackBar(content: Text('Account created successfully')),
       );
       Navigator.of(context).pushReplacementNamed(AppRoutes.splash);
     } on FirebaseAuthException catch (e) {
+      final code = e.code;
+      String message;
+      switch (code) {
+        case 'email-already-in-use':
+          message = 'Email is already in use';
+          break;
+        case 'invalid-email':
+          message = 'Invalid email address';
+          break;
+        case 'weak-password':
+          message = 'Password is too weak';
+          break;
+        case 'operation-not-allowed':
+          message = 'Email/password sign-in is disabled in Firebase Auth';
+          break;
+        case 'too-many-requests':
+          message = 'Too many attempts. Try again later';
+          break;
+        case 'network-request-failed':
+          message = 'Network error. Check your connection';
+          break;
+        default:
+          message = e.message ?? 'Registration failed';
+      }
       setState(() {
-        _error = e.message ?? 'Authentication failed';
+        _error = message;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_error!)),
+          SnackBar(content: Text(message)),
         );
       }
     } catch (_) {
@@ -55,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_error!)),
+          const SnackBar(content: Text('Something went wrong')),
         );
       }
     } finally {
@@ -67,33 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _forgotPassword() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty || !RegExp(r'^.+@.+\..+$').hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid email to reset password')),
-      );
-      return;
-    }
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password reset email sent to $email')),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Failed to send reset email')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(title: const Text('Create account')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -134,25 +146,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _loading ? null : _login,
+                      onPressed: _loading ? null : _register,
                       child: _loading
                           ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('Sign in'),
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: _loading ? null : _forgotPassword,
-                        child: const Text('Forgot password?'),
-                      ),
+                          : const Text('Create account'),
                     ),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: _loading
                           ? null
-                          : () => Navigator.pushNamed(context, AppRoutes.register),
-                      child: const Text("Don't have an account? Register"),
+                          : () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+                      child: const Text('Already have an account? Sign in'),
                     ),
                   ],
                 ),

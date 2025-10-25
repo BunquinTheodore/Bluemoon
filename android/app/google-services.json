@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676395979911",
+    "project_id": "bluemoon---delivery-app",
+    "storage_bucket": "bluemoon---delivery-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676395979911:android:208179180e656bce481422",
+        "android_client_info": {
+          "package_name": "com.example.my_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCckldXz0eQbTHvm3zYGnQl2wvHxFX1tYg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
